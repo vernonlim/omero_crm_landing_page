@@ -2,7 +2,7 @@
 [![Actions Status](https://github.com/vernonlim/omero-crm-landing-page/workflows/OMERO/badge.svg)](https://github.com/vernonlim/omero-crm-landing-page/actions)
 
 
-OMERO.omero-crm-landing-page
+OMERO.omero_crm_landing_page
 ==================================
 
 A landing page for CRM's dataset.
