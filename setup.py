@@ -26,7 +26,7 @@ setup(
     version=version,
     description="A landing page for CRM's dataset",
     packages=find_packages(),
-    keywords=["omero"],
+    keywords=["omero", "crm", "landing", "page"],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Environment :: Plugins",
