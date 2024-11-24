@@ -23,16 +23,16 @@ call ``pip`` with, for example: ``/path/to_web_venv/venv/bin/pip install ...``
 
 ::
 
-    $ pip install -U omero-crm-landing-page
+    $ pip install -U omero_crm_landing_page
 
 
 Development mode
 ----------------
 
-Install `omero-crm-landing-page` in development mode as follows:
+Install `omero_crm_landing_page` in development mode as follows:
 
     # within your python venv:
-    $ cd omero-crm-landing-page
+    $ cd omero_crm_landing_page
     $ pip install -e .
 
 After installation either from [Pypi](https://pypi.org/) or in development mode, you need to configure the application.

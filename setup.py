@@ -18,7 +18,7 @@
 #
 from setuptools import setup, find_packages
 
-url = "https://github.com/vernonlim/omero-crm-landing-page"
+url = "https://github.com/vernonlim/omero_crm_landing_page"
 version = "0.1.0.dev0"
 
 setup(
