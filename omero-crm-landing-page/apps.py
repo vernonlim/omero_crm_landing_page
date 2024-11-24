@@ -19,5 +19,5 @@
 from django.apps import AppConfig
 
 class FigureAppConfig(AppConfig):
-    name = "omero_crm_landing_page"
+    name = "omero-crm-landing-page"
     label = "landing"
