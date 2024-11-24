@@ -40,4 +40,4 @@ def index(request, conn=None, **kwargs):
     # print('context', context)
 
     # Render the html template and return the http response
-    return render(request, "omero-crm-landing-page/index.html", context)
+    return render(request, "omero_crm_landing_page/index.html", context)

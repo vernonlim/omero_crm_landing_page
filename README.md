@@ -40,16 +40,16 @@ To add the application to the `omero.web.apps` settings, run the following comma
 
 Note the usage of single quotes around double quotes:
 
-    $ omero config append omero.web.apps '"omero-crm-landing-page"'
+    $ omero config append omero.web.apps '"omero_crm_landing_page"'
 
 Optionally, add a link "Landing Page" at the top of the webclient to
 open the index page of this app:
 
-    $ omero config append omero.web.ui.top_links '["Landing Page", "omero-crm-landing-page_index", {"title": "Open Landing Page in new tab", "target": "_blank"}]'
+    $ omero config append omero.web.ui.top_links '["Landing Page", "omero_crm_landing_page_index", {"title": "Open Landing Page in new tab", "target": "_blank"}]'
 
 
 Now restart your `omero-web` server and go to
-<http://localhost:4080/omero-crm-landing-page/> in your browser.
+<http://localhost:4080/omero_crm_landing_page/> in your browser.
 
 
 Further Info

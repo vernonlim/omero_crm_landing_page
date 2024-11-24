@@ -22,5 +22,5 @@ from . import views
 
 urlpatterns = [
     # index 'home page' of the app
-    path("", views.index, name="omero-crm-landing-page_index"),
+    path("", views.index, name="omero_crm_landing_page_index"),
 ]
