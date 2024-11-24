@@ -22,7 +22,7 @@ url = "https://github.com/vernonlim/omero-crm-landing-page"
 version = "0.1.0.dev0"
 
 setup(
-    name="omero-crm-landing-page",
+    name="omero_crm_landing_page",
     version=version,
     description="A landing page for CRM's dataset",
     packages=find_packages(),
