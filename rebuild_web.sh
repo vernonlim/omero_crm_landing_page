@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # copy over the distribution files
 echo "Making folders..."
