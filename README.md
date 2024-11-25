@@ -1,73 +1,47 @@
+# Svelte + TS + Vite
 
-[![Actions Status](https://github.com/vernonlim/omero-crm-landing-page/workflows/OMERO/badge.svg)](https://github.com/vernonlim/omero-crm-landing-page/actions)
+This template should help get you started developing with Svelte and TypeScript in Vite.
 
+## Recommended IDE Setup
 
-OMERO.omero_crm_landing_page
-==================================
+[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-A landing page for CRM's dataset.
+## Need an official Svelte framework?
 
-Installation
-============
+Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
 
-This section assumes that an OMERO.web is already installed. See [OMERO.web installation instructions]<https://github.com/ome/omero-web/blob/master/README.rst> for more details.
+## Technical considerations
 
-Installing from Pypi
---------------------
+**Why use this over SvelteKit?**
 
-Install the app using [pip](<https://pip.pypa.io/en/stable/>) .
+- It brings its own routing solution which might not be preferable for some users.
+- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
 
-Ensure that you are running ``pip`` from the Python environment
-where ``omero-web`` is installed. Depending on your install, you may need to
-call ``pip`` with, for example: ``/path/to_web_venv/venv/bin/pip install ...``
+This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
 
-::
+Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
 
-    $ pip install -U omero_crm_landing_page
+**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
 
+Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
 
-Development mode
-----------------
+**Why include `.vscode/extensions.json`?**
 
-Install `omero_crm_landing_page` in development mode as follows:
+Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
 
-    # within your python venv:
-    $ cd omero_crm_landing_page
-    $ pip install -e .
+**Why enable `allowJs` in the TS template?**
 
-After installation either from [Pypi](https://pypi.org/) or in development mode, you need to configure the application.
-To add the application to the `omero.web.apps` settings, run the following command:
+While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
 
-Note the usage of single quotes around double quotes:
+**Why is HMR not preserving my local component state?**
 
-    $ omero config append omero.web.apps '"omero_crm_landing_page"'
+HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
 
-Optionally, add a link "Landing Page" at the top of the webclient to
-open the index page of this app:
+If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
 
-    $ omero config append omero.web.ui.top_links '["Landing Page", "omero_crm_landing_page_index", {"title": "Open Landing Page in new tab", "target": "_blank"}]'
-
-
-Now restart your `omero-web` server and go to
-<http://localhost:4080/omero_crm_landing_page/> in your browser.
-
-
-Further Info
-============
-
-1. This app was derived from [cookiecutter-omero-webapp](https://github.com/ome/cookiecutter-omero-webapp).
-2. For further info on deployment, see [Deployment](https://docs.openmicroscopy.org/latest/omero/developers/Web/Deployment.html)
-
-
-License
-=======
-
-This project, similar to many Open Microscopy Environment (OME) projects, is
-licensed under the terms of the AGPL v3.
-
-
-Copyright
-=========
-
-2024 vernonlim
-
+```ts
+// store.ts
+// An extremely simple external store
+import { writable } from 'svelte/store'
+export default writable(0)
+```
