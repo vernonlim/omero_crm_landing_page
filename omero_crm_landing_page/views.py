@@ -32,9 +32,7 @@ def index(request, conn=None, **kwargs):
     # Load the template html and replace OMEROWEB_INDEX
     template = loader.get_template('index.html')
     html = template.render({}, request)
-    omeroweb_index = reverse('omero_crm_landing_page_index')
-    html = html.replace('OMEROWEB_INDEX = dev_omeroweb_index',
-                        'OMEROWEB_INDEX = "%s"' % omeroweb_index)
+
     # update links to static files
     static_dir = static.static('/')
     html = html.replace('href="/assets/', 'href="%s' % static_dir)

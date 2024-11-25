@@ -1,7 +1,23 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import svelteLogo from './assets/svelte.svg';
+  import viteLogo from './assets/vite.svg';
+  import Counter from './lib/Counter.svelte';
+  import Display from './lib/Display.svelte';
+
+  let projectsUrl = window.location.origin + "/api/v0/m/projects/";
+  let projectCount = $state(0);
+  let projects = $state(0);
+
+  fetch(projectsUrl, {mode: 'cors', credentials: 'include'})
+    .then(rsp => rsp.json())
+    .then(data => {
+      let pc = data.meta.totalCount;
+      projectCount = pc;
+      projects = data.data;
+
+      console.log(projects);
+      console.log(projectCount);
+    })
 </script>
 
 <main>
@@ -17,6 +33,7 @@
 
   <div class="card">
     <Counter />
+    <Display>{projectCount}</Display>
   </div>
 
   <p>
