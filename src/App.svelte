@@ -6,7 +6,6 @@
 
   type Route = "home" | "projects" | "dataset";
   let currentRoute: Route = "home";
-  let selectedDatasetId: number | null = null;
 
   function isActive(route: Route) {
     return currentRoute === route;
@@ -31,6 +30,54 @@
   let projectImages = {};
   let searchQuery = "";
   let selectedImageId = null;
+
+  let currentPage = 1; // Pagination state
+  const datasetsPerPage = 5;
+
+  let viewerState = {
+    isOpen: false,
+    imageId: null as number | null,
+    datasetId: null as number | null,
+    viewerUrl: null as string | null,
+  };
+
+  function getFilteredDatasets() {
+    const allDatasets = Object.values(projectImages).flat();
+    return allDatasets.filter(
+      (image) =>
+        image.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        image.datasetName.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }
+
+  function getPaginatedDatasets() {
+    const filteredDatasets = getFilteredDatasets();
+    const startIndex = (currentPage - 1) * datasetsPerPage;
+    const endIndex = startIndex + datasetsPerPage;
+    return filteredDatasets.slice(startIndex, endIndex);
+  }
+
+  function changePage(newPage: number) {
+    currentPage = newPage; // Update the current page
+  }
+
+  function openViewer(imageId: number, datasetId: number) {
+    viewerState = {
+      isOpen: true,
+      imageId,
+      datasetId,
+      viewerUrl: getViewerUrl(imageId, datasetId),
+    };
+  }
+
+  function closeViewer() {
+    viewerState = {
+      isOpen: false,
+      imageId: null,
+      datasetId: null,
+      viewerUrl: null,
+    };
+  }
 
   onMount(() => {
     const hash = window.location.hash.replace("#", "").split("/");
@@ -160,41 +207,10 @@
     }
   }
 
-  // Pagination variables
-  let currentPage = 1;
-  const datasetsPerPage = 5;
-
-  function getFilteredDatasets() {
-    const allDatasets = Object.values(projectImages).flat();
-    return allDatasets.filter(
-      (image) =>
-        image.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        image.datasetName.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-  }
-
-  function getPaginatedDatasets() {
-    const filteredDatasets = getFilteredDatasets();
-    const startIndex = (currentPage - 1) * datasetsPerPage;
-    const endIndex = startIndex + datasetsPerPage;
-    return filteredDatasets.slice(startIndex, endIndex);
-  }
-
   $: {
     if (searchQuery) {
       currentPage = 1;
     }
-  }
-
-  function openViewerPopup(imageId: number, datasetId: number) {
-    const url = `http://localhost:4080/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
-    const owindow = window.open(
-      url,
-      "omeroViewer",
-      "height=600,width=850,left=50,top=50,toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=no,directories=no,status=no",
-    );
-    if (owindow && !owindow.closed) owindow.focus();
-    return false;
   }
 
   function getViewerUrl(imageId: number, datasetId: number) {
@@ -230,11 +246,61 @@
     {currentPage}
     {datasetsPerPage}
     {projectImages}
-    {navigate}
     {getViewerUrl}
-    {openViewerPopup}
+    {changePage}
+    onViewerOpen={openViewer}
   />
 {/if}
+
+<!-- Viewer Modal -->
+{#if viewerState.isOpen}
+  <div id="omero-viewer-container" style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>OMERO iviewer</h3>
+      <button on:click={closeViewer} class="viewer-btn">Close Viewer</button>
+      <a href={viewerState.imageId !== null && viewerState.datasetId !== null ? getViewerUrl(viewerState.imageId, viewerState.datasetId) : undefined}>
+        <button
+          class="viewer-btn"
+        >
+          View in iviewer
+        </button>
+      </a>
+    </div>
+    <iframe
+      id="omero-viewer-iframe"
+      src={viewerState.viewerUrl}
+      width="100%"
+      height="600"
+      style="border: 1px solid #ccc; border-radius: 8px;"
+      allowfullscreen
+    ></iframe>
+  </div>
+{/if}
+
+<section class="outro-section">
+    <div class="outro-columns">
+        <div class="outro-column left-column">
+            <h1>Every gift matters in the fight against cancer</h1>
+        </div>
+
+        <div class="vertical-divider"></div>
+
+        <div class="outro-column right-column">
+            <h2>
+                Support the essential work of our researchers, so that we
+                can provide access to world-class, compassionate care for
+                people with cancer.
+            </h2>
+
+            <button
+                class="donate-btn"
+                on:click={() => (window.location.href = "/donate")}
+            >
+                Donate Now
+            </button>
+        </div>
+    </div>
+</section>
 
 <footer class="site-footer">
   <div class="footer-container">
