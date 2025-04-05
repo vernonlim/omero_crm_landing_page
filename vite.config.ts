@@ -12,5 +12,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '') // Remove '/api' prefix
       }
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: 'static/[name]-[hash][extname]',
+        chunkFileNames: 'static/[name]-[hash].js',
+        entryFileNames: 'static/[name]-[hash].js',
+      },
+    },
+  },
 });

@@ -35,6 +35,6 @@ def index(request, conn=None, **kwargs):
 
     # update links to static files
     static_dir = static.static('/')
-    html = html.replace('href="/assets/', 'href="%s' % static_dir)
-    html = html.replace('src="/assets/', 'src="%s' % static_dir)
+    html = html.replace('href="/static/', 'href="%s' % static_dir)
+    html = html.replace('src="/static/', 'src="%s' % static_dir)
     return HttpResponse(html)
