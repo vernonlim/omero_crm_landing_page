@@ -2,54 +2,56 @@
     export let datasetCount: number;
     export let projects: any[];
     export let searchQuery: string;
-    export let getPaginatedDatasets: () => any[];
+    export let paginatedDatasets: { items: any[], length: number };
     export let currentPage: number;
     export let datasetsPerPage: number;
-    export let projectImages: any;
-    export let getViewerUrl: (imageId: number, datasetId: number) => string;
 
     export let changePage: (num: number) => void;
     export let onViewerOpen: (imageId: number, datasetId: number) => void;
+    export let onSearchUpdate: (query: string) => void;
+
+    $: hasNextPage = () => currentPage * datasetsPerPage < paginatedDatasets.length;
+    $: hasPrevPage = () => currentPage > 1;
 
     function openViewer(imageId: number, datasetId: number) {
-        selectedImageId = imageId;
-        selectedDatasetId = datasetId;
-
-        // Call the callback to notify the parent
-        onViewerOpen(imageId, datasetId);
+        onViewerOpen(imageId, datasetId); // Call the parent-provided callback
     }
 
-    let selectedImageId: number | null = null;
-    let selectedDatasetId: number | null = null;
-</script>
+    function handleSearchChange(e: Event) {
+        const value = (e.target as HTMLInputElement).value;
+        onSearchUpdate(value); // Call the parent-provided callback
+    }
 
-<section class="intro-section">
-    <div class="intro-content">
-        <h2>CRM: Breast Cancer Dataset</h2>
-        <p>
-            This is a portal to access our Breast Cancer Dataset, with
-            Whole-Slide Images of 5 different markers (CD3, CD4, CD8, H&E and
-            PDL1) from ~600 patients.
-        </p>
-        <p>
-            Click the "Help" button at the top right for instructions on how to
-            use this portal. Otherwise, click on one of the images below to be
-            sent to it in the main user interface.
-        </p>
-    </div>
-</section>
+    function clearSearch() {
+        onSearchUpdate(""); // Clear the search query
+    }
+</script>
 
 <main class="patient-data">
     <h3>Total Patients: {datasetCount}</h3>
 
     {#if projects.length > 0}
+      <div class="search-container">
         <input
             type="text"
             bind:value={searchQuery}
             placeholder="Search patients..."
             class="search-bar"
+            on:input={handleSearchChange}
         />
 
+        {#if searchQuery}
+            <button class="clear-search" on:click|preventDefault={clearSearch}>
+                &times;
+            </button>
+        {/if}
+      </div>
+
+        {#if paginatedDatasets.length === 0}
+          <div class="search-results-msg">
+            <p>No images found matching "{searchQuery}"</p>
+          </div>
+        {:else}
         <table class="omero-table">
             <thead>
                 <tr>
@@ -59,7 +61,7 @@
                 </tr>
             </thead>
             <tbody>
-                {#each getPaginatedDatasets() as image}
+                {#each paginatedDatasets.items as image}
                     <tr>
                         <td>
                             <img
@@ -69,7 +71,7 @@
                             />
                         </td>
                         <td>
-                            <a href="#" class="image-link">{image.imageName}</a>
+                           {image.imageName}
                         </td>
                         <td class="viewer-actions">
                             <button
@@ -86,17 +88,15 @@
 
         <!-- Pagination Controls -->
         <div class="pagination-controls">
-            <button on:click={() => changePage(currentPage - 1)} disabled={currentPage === 1}>
-                Previous
-            </button>
-            <span>Page {currentPage}</span>
-            <button
-                on:click={() => changePage(currentPage + 1)}
-                disabled={currentPage * datasetsPerPage >= Object.values(projectImages).flat().length}
-            >
-                Next
-            </button>
+          <button on:click={() => changePage(currentPage - 1)} disabled={!hasPrevPage()}>
+            Previous
+          </button>
+          <span>Page {currentPage}</span>
+          <button on:click={() => changePage(currentPage + 1)} disabled={!hasNextPage()}>
+            Next
+          </button>
         </div>
+      {/if}
     {:else}
         <p>Loading projects...</p>
     {/if}

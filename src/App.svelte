@@ -1,29 +1,32 @@
+<script context="module">
+  export type Route = "home" | "about" | "help" | "donate";
+</script>
+
 <script lang="ts">
   import "./app.css";
-  import ProjectTable from "./ProjectTable.svelte";
   import logo from "./assets/logo.png";
   import { onMount, onDestroy } from "svelte";
-    import Home from "./Home.svelte";
+  import Home from "./Home.svelte";
 
-  type Route = "home" | "projects" | "dataset";
+  const routes: { name: Route; label: string }[] = [
+    { name: "home", label: "Home" },
+    { name: "about", label: "Projects" },
+    { name: "help", label: "Help" },
+    { name: "donate", label: "Donate" },
+  ];
+
   let currentRoute: Route = "home";
 
   function isActive(route: Route) {
     return currentRoute === route;
   }
 
-  const routes = {
-    home: null,
-    about: null,
-    contact: null,
-  };
-
   // API endpoints
   let projectsUrl = "/api/v0/m/projects/";
   let datasetsUrl = "/api/v0/m/datasets/?project=";
   let imagesUrl = "/api/v0/m/images/?dataset=";
   let thumbnailUrl = "/webgateway/render_thumbnail/";
-  let tagsUrl = "/api/v0/m/tags/?project=";
+  let tagsUrl = "/v0/m/tags/?project=";
 
   // Reactive variables
   let datasetCount = 0;
@@ -35,49 +38,36 @@
   let currentPage = 1; // Pagination state
   const datasetsPerPage = 5;
 
-  function getFilteredDatasets() {
-    const allDatasets = Object.values(projectImages).flat();
-    return allDatasets.filter(
-      (image) =>
-        image.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        image.datasetName.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+  let paginatedDatasets: { items: any[], length: number } = {
+      items: [],
+      length: 0,
   }
 
-  function getPaginatedDatasets() {
-    const filteredDatasets = getFilteredDatasets();
-    const startIndex = (currentPage - 1) * datasetsPerPage;
-    const endIndex = startIndex + datasetsPerPage;
-    return filteredDatasets.slice(startIndex, endIndex);
+  function updateDatasets() {
+    paginatedDatasets = getPaginatedDatasets();
+  }
+
+  function getPaginatedDatasets(): { items: any[], length: number } {
+    const allImages = Object.values(projectImages).flat();
+  
+    const filtered = allImages.filter((img) =>
+      img.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      img.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  
+    const start = (currentPage - 1) * datasetsPerPage;
+    const end = start + datasetsPerPage;
+    
+    return { items: filtered.slice(start, end), length: filtered.length };
   }
 
   function changePage(newPage: number) {
     currentPage = newPage; // Update the current page
+    updateDatasets();
   }
 
-  onMount(() => {
-    const hash = window.location.hash.replace("#", "").split("/");
-
-    if (hash[0] && routes[hash[0]]) {
-      currentRoute = hash[0] as Route;
-      if (hash[0] === "dataset" && hash[1]) {
-        selectedImageId = parseInt(hash[1]);
-      }
-    }
-
-    window.addEventListener("hashchange", () => {
-      const newHash = window.location.hash.replace("#", "").split("/");
-      currentRoute =
-        newHash[0] && routes[newHash[0]] ? (newHash[0] as Route) : "home";
-      if (newHash[0] === "dataset" && newHash[1]) {
-        selectedImageId = parseInt(newHash[1]);
-      }
-    });
-  });
-
-  function navigate(route: Route, id: number = 0) {
+  function navigate(route: Route) {
     currentRoute = route;
-    window.location.hash = id ? `${route}/${id}` : route;
     window.scrollTo(0, 0);
   }
 
@@ -181,6 +171,8 @@
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+
+    updateDatasets();
   }
 
   $: {
@@ -198,40 +190,45 @@
   <div class="nav-container">
     <img src={logo} alt="Company Logo" class="logo" />
     <ul class="nav-links">
-      <li class:active={isActive("home")}>
-        <a href="#" on:click|preventDefault={() => navigate("home")}
-          ><span>Home</span></a
-        >
-      </li>
-      <li>
-        <a href="/about"><span>About Us</span></a>
-      </li>
-      <li>
-        <a href="/contact"><span>Help</span></a>
-      </li>
+      {#each routes as route}
+        <li class:active={isActive(route.name)}>
+          <button type="button" on:click={() => navigate(route.name)}>
+            {route.label}
+          </button>
+        </li>
+      {/each}
     </ul>
   </div>
 </nav>
 
-{#if currentRoute === "home"}
-  <Home
-    {datasetCount}
-    {projects}
-    {searchQuery}
-    {getPaginatedDatasets}
-    {currentPage}
-    {datasetsPerPage}
-    {projectImages}
-    {getViewerUrl}
-    {changePage}
-  />
-{/if}
+<div class="page-container">
+  {#if currentRoute === "home"}
+    <Home
+      {datasetCount}
+      {projects}
+      {searchQuery}
+      {paginatedDatasets}
+      {currentPage}
+      {datasetsPerPage}
+      {getViewerUrl}
+      {changePage}
+      {navigate}
+      onSearchUpdate={search => {searchQuery = search; updateDatasets();}}
+    />
+  {:else if currentRoute === "about"}
+
+  {:else if currentRoute === "help"}
+
+  {:else if currentRoute === "donate"}
+
+  {/if}
+</div>
 
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-section">
       <h3>Get in Touch</h3>
-      <p>Cancer Research Malaysia 200001007481 (510087-M)</p>
+      <p>Cancer Research Malaysia <span>200001007481 (510087-M)</span></p>
       <p>+603 5650 9797 (9am – 5pm)</p>
       <p>
         Level 1, Subang Jaya Medical Centre South Tower, No. 1, Jalan SS 12/1A,
@@ -242,17 +239,13 @@
     <div class="footer-section">
       <h3>Explore</h3>
       <ul>
-        <li class:active={isActive("home")}>
-          <a href="#" on:click|preventDefault={() => navigate("home")}>Home</a>
-        </li>
-        <li class:active={isActive("projects")}>
-          <a
-            href="#projects"
-            on:click|preventDefault={() => navigate("projects")}>Projects</a
-          >
-        </li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
+        {#each routes as route}
+          <li class:active={isActive(route.name)}>
+            <button type="button" on:click={() => navigate(route.name)}>
+              {route.label}
+            </button>
+          </li>
+        {/each}
       </ul>
     </div>
 
