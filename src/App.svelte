@@ -182,7 +182,7 @@
   }
 
   function getViewerUrl(imageId: number, datasetId: number) {
-    return `http://localhost:4080/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
+    return window.location.origin + `/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
   }
 </script>
 
