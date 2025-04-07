@@ -1,25 +1,23 @@
-<script context="module">
-  export type Route = "home" | "about" | "help" | "donate";
-</script>
-
 <script lang="ts">
   import "./app.css";
+  import ProjectTable from "./ProjectTable.svelte";
+  import Guide from "./Guide.svelte";
   import logo from "./assets/logo.png";
   import { onMount, onDestroy } from "svelte";
   import Home from "./Home.svelte";
 
-  const routes: { name: Route; label: string }[] = [
-    { name: "home", label: "Home" },
-    { name: "about", label: "Projects" },
-    { name: "help", label: "Help" },
-    { name: "donate", label: "Donate" },
-  ];
-
+  type Route = "home" | "guide";
   let currentRoute: Route = "home";
 
   function isActive(route: Route) {
     return currentRoute === route;
   }
+
+  const routes = {
+    home: null,
+    about: null,
+    guide: Guide,
+  };
 
   // API endpoints
   let projectsUrl = "/api/v0/m/projects/";
@@ -38,36 +36,60 @@
   let currentPage = 1; // Pagination state
   const datasetsPerPage = 5;
 
-  let paginatedDatasets: { items: any[], length: number } = {
-      items: [],
-      length: 0,
-  }
-
-  function updateDatasets() {
-    paginatedDatasets = getPaginatedDatasets();
-  }
-
-  function getPaginatedDatasets(): { items: any[], length: number } {
-    const allImages = Object.values(projectImages).flat();
-  
-    const filtered = allImages.filter((img) =>
-      img.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
+  function getFilteredDatasets() {
+    const allDatasets = Object.values(projectImages).flat();
+    return allDatasets.filter(
+      (image) =>
+        image.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        image.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  
+  }
+
+  function getPaginatedDatasets(): { items: any[]; total: number } {
+    const allImages = Object.values(projectImages).flat();
+
+    const filtered = allImages.filter(
+      (img) =>
+        img.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        img.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     const start = (currentPage - 1) * datasetsPerPage;
     const end = start + datasetsPerPage;
-    
-    return { items: filtered.slice(start, end), length: filtered.length };
+
+    return {
+      items: filtered.slice(start, end),
+      total: filtered.length,
+    };
   }
 
   function changePage(newPage: number) {
     currentPage = newPage; // Update the current page
-    updateDatasets();
   }
 
-  function navigate(route: Route) {
+  onMount(() => {
+    const hash = window.location.hash.replace("#", "").split("/");
+
+    if (hash[0] && routes[hash[0]]) {
+      currentRoute = hash[0] as Route;
+      if (hash[0] === "dataset" && hash[1]) {
+        selectedImageId = parseInt(hash[1]);
+      }
+    }
+
+    window.addEventListener("hashchange", () => {
+      const newHash = window.location.hash.replace("#", "").split("/");
+      currentRoute =
+        newHash[0] && routes[newHash[0]] ? (newHash[0] as Route) : "home";
+      if (newHash[0] === "dataset" && newHash[1]) {
+        selectedImageId = parseInt(newHash[1]);
+      }
+    });
+  });
+
+  function navigate(route: Route, id: number = 0) {
     currentRoute = route;
+    window.location.hash = id ? `${route}/${id}` : route;
     window.scrollTo(0, 0);
   }
 
@@ -118,7 +140,7 @@
                   let imgResponse = await fetch(`${imagesUrl}${datasetId}`);
                   if (!imgResponse.ok) {
                     throw new Error(
-                      `HTTP error! status: ${imgResponse.status}`,
+                      `HTTP error! status: ${imgResponse.status}`
                     );
                   }
                   let imgData = await imgResponse.json();
@@ -147,23 +169,23 @@
                         imageName: img.Name || "Unnamed Image",
                         projectDescription: project.Description || "N/A",
                       };
-                    }),
+                    })
                   );
                 } catch (imgError) {
                   console.error(
                     `Error fetching images for dataset ${datasetId}:`,
-                    imgError,
+                    imgError
                   );
                 }
-              }),
+              })
             );
           } catch (datasetError) {
             console.error(
               `Error fetching datasets for project ${projectId}:`,
-              datasetError,
+              datasetError
             );
           }
-        }),
+        })
       );
 
       projectImages = { ...tempProjectImages };
@@ -171,8 +193,6 @@
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-
-    updateDatasets();
   }
 
   $: {
@@ -182,7 +202,7 @@
   }
 
   function getViewerUrl(imageId: number, datasetId: number) {
-    return window.location.origin + `/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
+    return `http://localhost:4080/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
   }
 </script>
 
@@ -190,13 +210,19 @@
   <div class="nav-container">
     <img src={logo} alt="Company Logo" class="logo" />
     <ul class="nav-links">
-      {#each routes as route}
-        <li class:active={isActive(route.name)}>
-          <button type="button" on:click={() => navigate(route.name)}>
-            {route.label}
-          </button>
-        </li>
-      {/each}
+      <li class:active={isActive("home")}>
+        <a href="#" on:click|preventDefault={() => navigate("home")}
+          ><span>Home</span></a
+        >
+      </li>
+      <li>
+        <a href="/about"><span>About Us</span></a>
+      </li>
+      <li class:active={isActive("guide")}>
+        <a href="#guide" on:click|preventDefault={() => navigate("guide")}
+          ><span>Help</span></a
+        >
+      </li>
     </ul>
   </div>
 </nav>
@@ -207,20 +233,16 @@
       {datasetCount}
       {projects}
       {searchQuery}
-      {paginatedDatasets}
+      {getPaginatedDatasets}
       {currentPage}
       {datasetsPerPage}
+      {projectImages}
       {getViewerUrl}
       {changePage}
-      {navigate}
-      onSearchUpdate={search => {searchQuery = search; updateDatasets();}}
+      on:updateSearch={(e) => (searchQuery = e.detail)}
     />
-  {:else if currentRoute === "about"}
-
-  {:else if currentRoute === "help"}
-
-  {:else if currentRoute === "donate"}
-
+  {:else if currentRoute === "guide"}
+    <Guide />
   {/if}
 </div>
 
@@ -239,13 +261,17 @@
     <div class="footer-section">
       <h3>Explore</h3>
       <ul>
-        {#each routes as route}
-          <li class:active={isActive(route.name)}>
-            <button type="button" on:click={() => navigate(route.name)}>
-              {route.label}
-            </button>
-          </li>
-        {/each}
+        <li class:active={isActive("home")}>
+          <a href="#" on:click|preventDefault={() => navigate("home")}>Home</a>
+        </li>
+        <li class:active={isActive("projects")}>
+          <a
+            href="#projects"
+            on:click|preventDefault={() => navigate("projects")}>Projects</a
+          >
+        </li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
       </ul>
     </div>
 
@@ -265,4 +291,3 @@
     </p>
   </div>
 </footer>
-

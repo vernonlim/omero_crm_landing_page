@@ -1,17 +1,16 @@
 <script lang="ts">
-    import type { Route } from "./App.svelte";
+    import { onMount } from 'svelte';
     import ProjectTable from "./ProjectTable.svelte";
   
     export let datasetCount: number;
     export let projects: any[];
     export let searchQuery: string;
-    export let paginatedDatasets: { items: any[], length: number };
+    export let getPaginatedDatasets: () => any[];
     export let currentPage: number;
     export let datasetsPerPage: number;
+    export let projectImages: any;
     export let getViewerUrl: (imageId: number, datasetId: number) => string;
     export let changePage: (num: number) => void;
-    export let navigate: (route: Route) => void;
-    export let onSearchUpdate: (search: string) => void;
     
     let viewerContainer: HTMLElement;
     let topAnchor: HTMLElement; 
@@ -50,56 +49,37 @@
             viewerUrl: null,
         };
 
-        setTimeout(() => {
-            if (topAnchor) {
-                topAnchor.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        }, 50);
-    }
+    setTimeout(() => {
+        if (topAnchor) {
+            topAnchor.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }, 50);
+  }
 
-    function updateSearch(search: string) {
-        searchQuery = search;
-        onSearchUpdate(search);
-    }
 </script>
 
 <div bind:this={topAnchor}></div>
-
-<section class="intro-section">
-    <div class="intro-content">
-        <h2>Cancer Research Malaysia</h2>
-        <h2>Breast Cancer Dataset</h2>
-        <p>
-            This is a portal to access our Breast Cancer Dataset, with
-            Whole-Slide Images of 5 different markers (CD3, CD4, CD8, H&E and
-            PDL1) from ~600 patients.
-        </p>
-        <p>
-            Click the "Help" button at the top right for instructions on how to
-            use this portal. Otherwise, click on one of the images below to be
-            sent to it in the main user interface.
-        </p>
-    </div>
-</section>
 
 <ProjectTable
     {datasetCount}
     {projects}
     {searchQuery}
-    {paginatedDatasets}
+    {getPaginatedDatasets}
     {currentPage}
     {datasetsPerPage}
+    {projectImages}
+    {getViewerUrl}
     {changePage}
     onViewerOpen={openViewer}
-    onSearchUpdate={q => updateSearch(q)}
+    on:updateSearch
 />
 
 <!-- Viewer Modal -->
 {#if viewerState.isOpen}
-  <div id="omero-viewer-container" style="width: 100%; margin-top: 0px; padding-top: 50px; scroll-margin-top: 50px;" bind:this={viewerContainer}>
+  <div id="omero-viewer-container" style="margin-top: 0px; padding-top: 50px; scroll-margin-top: 50px;" bind:this={viewerContainer}>
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 2rem;">
       <h3>OMERO iviewer</h3>
       <button on:click={closeViewer} class="viewer-btn">Close Viewer</button>
@@ -117,7 +97,7 @@
       id="omero-viewer-iframe"
       src={viewerState.viewerUrl}
       width="100%"
-      height="800"
+      height="650"
       style="border: 1px solid #ccc; border-radius: 8px;"
       allowfullscreen
     ></iframe>
@@ -141,7 +121,7 @@
 
             <button
                 class="donate-btn"
-                on:click={() => (navigate("donate"))}
+                on:click={() => (window.location.href = "/donate")}
             >
                 Donate Now
             </button>

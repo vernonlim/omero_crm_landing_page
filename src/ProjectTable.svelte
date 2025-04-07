@@ -1,31 +1,56 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
+    const dispatch = createEventDispatcher();
+
     export let datasetCount: number;
     export let projects: any[];
     export let searchQuery: string;
-    export let paginatedDatasets: { items: any[], length: number };
+    export let getPaginatedDatasets: () => { items: any[]; total: number };
     export let currentPage: number;
     export let datasetsPerPage: number;
+    export let projectImages: any;
+    export let getViewerUrl: (imageId: number, datasetId: number) => string;
 
     export let changePage: (num: number) => void;
     export let onViewerOpen: (imageId: number, datasetId: number) => void;
-    export let onSearchUpdate: (query: string) => void;
 
-    $: hasNextPage = () => currentPage * datasetsPerPage < paginatedDatasets.length;
+    $: hasNextPage = () => currentPage * datasetsPerPage < getPaginatedDatasets().total;
     $: hasPrevPage = () => currentPage > 1;
 
     function openViewer(imageId: number, datasetId: number) {
-        onViewerOpen(imageId, datasetId); // Call the parent-provided callback
+        selectedImageId = imageId;
+        selectedDatasetId = datasetId;
+
+        // Call the callback to notify the parent
+        onViewerOpen(imageId, datasetId);
     }
 
     function handleSearchChange(e: Event) {
         const value = (e.target as HTMLInputElement).value;
-        onSearchUpdate(value); // Call the parent-provided callback
+        dispatch("updateSearch", value);
     }
 
-    function clearSearch() {
-        onSearchUpdate(""); // Clear the search query
-    }
+    let selectedImageId: number | null = null;
+    let selectedDatasetId: number | null = null;
+
 </script>
+
+<section class="intro-section">
+    <div class="intro-content">
+        <h2>Cancer Research Malaysia</h2>
+        <h2>Breast Cancer Dataset</h2>
+        <p>
+            This is a portal to access our Breast Cancer Dataset, with
+            Whole-Slide Images of 5 different markers (CD3, CD4, CD8, H&E and
+            PDL1) from ~600 patients.
+        </p>
+        <p>
+            Click the "Help" button at the top right for instructions on how to
+            use this portal. Otherwise, click on one of the images below to be
+            sent to it in the main user interface.
+        </p>
+    </div>
+</section>
 
 <main class="patient-data">
     <h3>Total Patients: {datasetCount}</h3>
@@ -41,13 +66,13 @@
         />
 
         {#if searchQuery}
-            <button class="clear-search" on:click|preventDefault={clearSearch}>
+            <button class="clear-search" on:click|preventDefault={() => dispatch("updateSearch", "")}>
                 &times;
             </button>
         {/if}
       </div>
 
-        {#if paginatedDatasets.length === 0}
+        {#if getPaginatedDatasets().items.length === 0}
           <div class="search-results-msg">
             <p>No images found matching "{searchQuery}"</p>
           </div>
@@ -61,7 +86,7 @@
                 </tr>
             </thead>
             <tbody>
-                {#each paginatedDatasets.items as image}
+                {#each getPaginatedDatasets().items as image}
                     <tr>
                         <td>
                             <img
