@@ -7,6 +7,7 @@
   import logo from "./assets/logo.png";
   import { onMount, onDestroy } from "svelte";
   import Home from "./Home.svelte";
+  import Help from "./Guide.svelte";
 
   const routes: { name: Route; label: string }[] = [
     { name: "home", label: "Home" },
@@ -38,26 +39,27 @@
   let currentPage = 1; // Pagination state
   const datasetsPerPage = 5;
 
-  let paginatedDatasets: { items: any[], length: number } = {
-      items: [],
-      length: 0,
-  }
+  let paginatedDatasets: { items: any[]; length: number } = {
+    items: [],
+    length: 0,
+  };
 
   function updateDatasets() {
     paginatedDatasets = getPaginatedDatasets();
   }
 
-  function getPaginatedDatasets(): { items: any[], length: number } {
+  function getPaginatedDatasets(): { items: any[]; length: number } {
     const allImages = Object.values(projectImages).flat();
-  
-    const filtered = allImages.filter((img) =>
-      img.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const filtered = allImages.filter(
+      (img) =>
+        img.imageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        img.datasetName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  
+
     const start = (currentPage - 1) * datasetsPerPage;
     const end = start + datasetsPerPage;
-    
+
     return { items: filtered.slice(start, end), length: filtered.length };
   }
 
@@ -118,7 +120,7 @@
                   let imgResponse = await fetch(`${imagesUrl}${datasetId}`);
                   if (!imgResponse.ok) {
                     throw new Error(
-                      `HTTP error! status: ${imgResponse.status}`,
+                      `HTTP error! status: ${imgResponse.status}`
                     );
                   }
                   let imgData = await imgResponse.json();
@@ -147,23 +149,23 @@
                         imageName: img.Name || "Unnamed Image",
                         projectDescription: project.Description || "N/A",
                       };
-                    }),
+                    })
                   );
                 } catch (imgError) {
                   console.error(
                     `Error fetching images for dataset ${datasetId}:`,
-                    imgError,
+                    imgError
                   );
                 }
-              }),
+              })
             );
           } catch (datasetError) {
             console.error(
               `Error fetching datasets for project ${projectId}:`,
-              datasetError,
+              datasetError
             );
           }
-        }),
+        })
       );
 
       projectImages = { ...tempProjectImages };
@@ -182,7 +184,10 @@
   }
 
   function getViewerUrl(imageId: number, datasetId: number) {
-    return window.location.origin + `/webclient/img_detail/${imageId}/?dataset=${datasetId}`;
+    return (
+      window.location.origin +
+      `/webclient/img_detail/${imageId}/?dataset=${datasetId}`
+    );
   }
 </script>
 
@@ -213,15 +218,14 @@
       {getViewerUrl}
       {changePage}
       {navigate}
-      onSearchUpdate={search => {searchQuery = search; updateDatasets();}}
+      onSearchUpdate={(search) => {
+        searchQuery = search;
+        updateDatasets();
+      }}
     />
-  {:else if currentRoute === "about"}
-
-  {:else if currentRoute === "help"}
-
-  {:else if currentRoute === "donate"}
-
-  {/if}
+  {:else if currentRoute === "about"}{:else if currentRoute === "help"}
+    <Help />
+  {:else if currentRoute === "donate"}{/if}
 </div>
 
 <footer class="site-footer">
@@ -265,4 +269,3 @@
     </p>
   </div>
 </footer>
-
