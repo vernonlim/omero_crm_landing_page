@@ -421,6 +421,7 @@ main {
   position: sticky;
   top: 100px;
   align-self: flex-start;
+  margin-left: -30px;
   width: 250px;
   max-height: calc(100vh - 120px);
   overflow-y: auto;

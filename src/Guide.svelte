@@ -5,6 +5,13 @@
   import crm3 from "./assets/crm3.png";
   import crm4 from "./assets/crm4.png";
   import crm5 from "./assets/crm5.png";
+  import crm6 from "./assets/crm6.png";
+  import crm7 from "./assets/crm7.png";
+  import crm8 from "./assets/crm8.png";
+  import crm9 from "./assets/crm9.png";
+  import crm10 from "./assets/crm10.png";
+  import crm11 from "./assets/crm11.png";
+  import crm12 from "./assets/crm12.png";
 
   let sectionRefs: Record<string, HTMLElement> = {};
   let activeSection: string = "";
@@ -117,6 +124,68 @@
       ],
     },
     {
+      id: "OMERO UI",
+      title: "Using OMERO Web",
+      steps: [
+        {
+          stepNumber: 1,
+          content: `
+          <p>The OMERO main user interface shows your data tree in the left-hand panel.
+             When data is selected in the tree, the thumbnails are displayed in the center panel, 
+             and the metadata and other information in the right-hand panel.</p>
+        `,
+          imageSrc: crm6,
+          altText: "OMERO interface",
+        },
+        {
+          stepNumber: 2,
+          content: `
+          <p>To view an image in the Image Viewer, select the image in the data tree and click on the 'Full Viewer' button.<br><br>
+          or double click on the image or thumbnail.</p>
+        `,
+          imageSrc: crm12,
+          altText: "View image in OMERO iViewer",
+        },
+      ],
+    },
+    {
+      id: "OMERO General",
+      title: "OMERO Web - General",
+      message: "Edit Image Name and Image Description",
+      steps: [
+        {
+          stepNumber: 1,
+          content: `
+          <p>In the General tab of the right-hand panel, click on the pencil icon to edit the image name or image description.
+            Summary details of the image can be seen below the description.</p>
+        `,
+          imageSrc: crm7,
+          altText: "OMERO web general tab",
+        },
+      ],
+    },
+    {
+      id: "OMERO Group",
+      title: "OMERO Web - Grouping",
+      message: "Data Management",
+      steps: [
+        {
+          stepNumber: 1,
+          content: `
+          <p>If you belong to more than one group, you can interact with the data of other users in your group.<br><br>
+          Click on the drop-down arrow to the right of your name in the bar above the data tree, and select a group and user,
+          or All members to see all the data in the group.<br><br>
+          For details of how to share data using OMERO see the <a
+                  href="https://omero-guides.readthedocs.io/en/latest/introduction/docs/data-management.html"
+                  target="_blank">Sharing Data workflow section</a
+          ></p>
+        `,
+          imageSrc: crm11,
+          altText: "grouping",
+        },
+      ],
+    },
+    {
       id: "troubleshooting",
       title: "Troubleshooting",
       steps: [
@@ -124,6 +193,15 @@
           stepNumber: 1,
           content: `
           <h3>Need further assistance? <br>Contact our support team at <a href="mailto:info@cancerresearch.my">info@cancerresearch.my</a></h3>
+        `,
+        },
+        {
+          stepNumber: 2,
+          content: `
+          <h3>For more information about OMERO web, refer to the <a
+                  href="https://help.glencoesoftware.com/omero-plus/5.2/web-client.html"
+                  target="_blank">OMERO Quickstart User Guides</a
+                ></h3>
         `,
         },
       ],
@@ -209,6 +287,9 @@
         {#if section.id === "viewing"}
           <h3>View image in the OMERO main user interface</h3>
         {/if}
+        {#if section.id === "OMERO General"}
+          <h3>Share Images</h3>
+        {/if}
         {#if section.id === "viewing"}
           <div class="step">
             <div class="step-number">1</div>
@@ -218,6 +299,53 @@
                 of OMERO iViewer to open up OMERO web in order to explore more
                 advanced viewing features in the OMERO main user interface.
               </p>
+            </div>
+          </div>
+        {/if}
+        {#if section.id === "OMERO General"}
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <p>
+                Click on the 'link' button to generate a URL to share the image.
+              </p>
+              <img
+                src={crm8}
+                alt="link button in OMERO Web"
+                class="screenshot"
+              />
+            </div>
+          </div>
+        {/if}
+        {#if section.id === "OMERO General"}
+          <h3>Annotating Data</h3>
+        {/if}
+        {#if section.id === "OMERO General"}
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <p>
+                Use the Annotations section to add a rating, tag, or attachment
+                to a Project, Dataset or image.
+              </p>
+              <p>
+                For more information, refer to the <a
+                  href="https://omero-guides.readthedocs.io/en/latest/introduction/docs/index.html"
+                  target="_blank">Managing Data</a
+                > Documentation
+              </p>
+              <img src={crm9} alt="Annotations Section" class="screenshot" />
+            </div>
+          </div>
+        {/if}
+        {#if section.id === "OMERO General"}
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <p>
+                Key-Value pairs and comments can also be added as annotations.
+              </p>
+              <img src={crm10} alt="Key-Value pairs" class="screenshot" />
             </div>
           </div>
         {/if}
