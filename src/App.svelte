@@ -223,8 +223,9 @@
         updateDatasets();
       }}
     />
-  {:else if currentRoute === "about"}{:else if currentRoute === "help"}<Help
-    />{:else if currentRoute === "donate"}{/if}
+  {:else if currentRoute === "about"}{:else if currentRoute === "help"}
+    <Help />
+  {:else if currentRoute === "donate"}{/if}
 </div>
 
 <footer class="site-footer">
