@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import logo from "./assets/logo.png";
   import crm1 from "./assets/crm1.png";
   import crm2 from "./assets/crm2.png";
   import crm3 from "./assets/crm3.png";
