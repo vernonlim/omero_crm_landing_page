@@ -22,6 +22,12 @@
     return currentRoute === route;
   }
 
+  function handleRouteChange(path: string) {
+    const route = path.replace("/", "") as Route;
+    const validRoute = routes.some((r) => r.name === route);
+    currentRoute = validRoute ? route : "home";
+  }
+
   // API endpoints
   let projectsUrl = "/api/v0/m/projects/";
   let datasetsUrl = "/api/v0/m/datasets/?project=";
@@ -70,10 +76,17 @@
 
   function navigate(route: Route) {
     currentRoute = route;
+    window.history.pushState({ route }, "", `/${route}`);
     window.scrollTo(0, 0);
   }
 
   onMount(() => {
+    handleRouteChange(window.location.pathname);
+
+    window.onpopstate = (event) => {
+      handleRouteChange(event.state?.route);
+    };
+
     fetchProjects();
   });
 
@@ -189,6 +202,10 @@
       `/webclient/img_detail/${imageId}/?dataset=${datasetId}`
     );
   }
+
+  onDestroy(() => {
+    window.onpopstate = null;
+  });
 </script>
 
 <nav>
@@ -198,7 +215,7 @@
       {#each routes as route}
         <li class:active={isActive(route.name)}>
           <button type="button" on:click={() => navigate(route.name)}>
-            {route.label}
+            <span>{route.label}</span>
           </button>
         </li>
       {/each}
