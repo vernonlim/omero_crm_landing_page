@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
-import history from "connect-history-api-fallback";
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import history from 'connect-history-api-fallback';
 
 // https://vite.dev/config/
 export default defineConfig({
