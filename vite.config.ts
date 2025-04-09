@@ -7,10 +7,10 @@ export default defineConfig({
   plugins: [svelte()],
   server: {
     proxy: {
-      "/api": {
-        target: "http://localhost:4080", // Your OMERO-Web API
+      '/api': {
+        target: 'http://localhost:4080', // Your OMERO-Web API
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""), // Remove '/api' prefix
+        rewrite: (path) => path.replace(/^\/api/, ''), // Remove '/api' prefix
       },
     },
     fs: { strict: true },
@@ -28,9 +28,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: "static/[name]-[hash][extname]",
-        chunkFileNames: "static/[name]-[hash].js",
-        entryFileNames: "static/[name]-[hash].js",
+        assetFileNames: 'static/[name]-[hash][extname]',
+        chunkFileNames: 'static/[name]-[hash].js',
+        entryFileNames: 'static/[name]-[hash].js',
       },
     },
   },
