@@ -71,7 +71,7 @@
                             />
                         </td>
                         <td>
-                           {image.imageName}
+                           <a href={`http://localhost:4080/webclient/?show=image-${image.id}`}>{image.imageName}</a>
                         </td>
                         <td class="viewer-actions">
                             <button

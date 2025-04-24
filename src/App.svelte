@@ -11,7 +11,7 @@
 
   const routes: { name: Route; label: string }[] = [
     { name: "home", label: "Home" },
-    { name: "about", label: "Projects" },
+    { name: "about", label: "About" },
     { name: "help", label: "Help" },
     { name: "donate", label: "Donate" },
   ];
@@ -76,7 +76,6 @@
 
   function navigate(route: Route) {
     currentRoute = route;
-    window.history.pushState({ route }, "", `/${route}`);
     window.scrollTo(0, 0);
   }
 
@@ -240,9 +239,13 @@
         updateDatasets();
       }}
     />
-  {:else if currentRoute === "about"}{:else if currentRoute === "help"}
-    <Help />
-  {:else if currentRoute === "donate"}{/if}
+  {:else if currentRoute === "about"}
+    <main></main>
+  {:else if currentRoute === "help"}
+    <Help/>
+  {:else if currentRoute === "donate"}
+    <main></main>
+  {/if}
 </div>
 
 <footer class="site-footer">
