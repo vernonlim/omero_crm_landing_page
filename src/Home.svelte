@@ -103,7 +103,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 2rem;">
       <h3>OMERO iviewer</h3>
       <button on:click={closeViewer} class="viewer-btn">Close Viewer</button>
-      <a href={`http://localhost:4080/webclient/?show=image-${viewerState.imageId}`} 
+      <a href={window.location.origin + `/webclient/?show=image-${viewerState.imageId}`} 
          target="_blank" 
          rel="noopener noreferrer">
         <button

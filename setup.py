@@ -42,7 +42,7 @@ setup(
     author="Nottingham SEGP Group 12",
     author_email="vernonlim2004@gmail.com",
     license="AGPLv3",
-    url="%s" % url,
+    url="https://github.com/vernonlim/omero_crm_landing_page",
     zip_safe=False,
     download_url="%s/v%s.tar.gz" % (url, version),
     include_package_data=True,
